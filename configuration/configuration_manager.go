@@ -19,8 +19,11 @@ func New(opts ...configurationValueGetter) *ConfigurationManager {
 	return configManager
 }
 
-func (m *ConfigurationManager) GetOptionalValue(key string) string {
-	val, _ := m.GetRequiredValue(key)
+func (m *ConfigurationManager) GetOptionalValue(key string, defaultValue string) string {
+	val, err := m.GetRequiredValue(key)
+	if err != nil {
+		return defaultValue
+	}
 	return val
 }
 

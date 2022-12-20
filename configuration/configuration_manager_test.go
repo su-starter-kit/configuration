@@ -134,14 +134,30 @@ func TestConfigurationManager_GetRequiredValue_LoadsConfigurationValue_Respectin
 	}
 }
 
-func TestConfigurationManager_GetOptionalValue_ReturnsEmptyString_WhenNoValueGetterIsConfigured(t *testing.T) {
+func TestConfigurationManager_GetOptionalValue_ReturnsDefaultString_WhenNoValueGetterIsConfigured(t *testing.T) {
 	configManager := New()
 
-	val := configManager.GetOptionalValue("SOME_KEY")
+	defaultValue := "default value"
 
-	assert.Equal(t, val, "")
+	val := configManager.GetOptionalValue("SOME_KEY", defaultValue)
+
+	assert.Equal(t, defaultValue, val)
 }
+func TestConfigurationManager_GetOptionalValue_ReturnsDefaultString_WhenNoValueDoesNotExistsInValueGetters(t *testing.T) {
+	configManager := New(
+		WithInMemoryGetter(
+			map[string]string{
+				"SOME_KEY": "SOME_VALUE",
+			},
+		),
+	)
 
+	defaultValue := "default value"
+
+	val := configManager.GetOptionalValue("SOME_OTHER_KEY", defaultValue)
+
+	assert.Equal(t, defaultValue, val)
+}
 func TestConfigurationManager_GetOptionalValue_LoadsConfigurationValue_WhenValueExists(t *testing.T) {
 	const CONFIG_KEY string = "CONFIG_KEY"
 	const CONFIG_VALUE string = "config value"
@@ -154,7 +170,7 @@ func TestConfigurationManager_GetOptionalValue_LoadsConfigurationValue_WhenValue
 		),
 	)
 
-	val := configManager.GetOptionalValue(CONFIG_KEY)
+	val := configManager.GetOptionalValue(CONFIG_KEY, "some default value")
 
-	assert.Equal(t, val, CONFIG_VALUE)
+	assert.Equal(t, CONFIG_VALUE, val)
 }
